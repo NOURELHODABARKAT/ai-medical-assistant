@@ -1,105 +1,128 @@
-# 🩺 AI Medical Assistant
 
-A multilingual (Arabic, French, English) AI-powered medical assistant built with Flask and Google Gemini. It conducts an interactive step-by-step health diagnosis and recommends the appropriate medical specialty and nearby doctors based on user input and location.
+# 🧠 AI Medical Assistant (Flask)
 
----
-
-## ✨ Features
-
-- 💬 Multilingual support (AR, FR, EN)
-- 🧠 Smart medical specialty recommendation using Google Gemini
-- 📍 Nearest doctor suggestion based on user location
-- 🧾 Session tracking using Redis
-- 🛡️ Rate limiting to prevent abuse (Flask-Limiter)
+A secure, multilingual medical assistant web app built with Flask.  
+Users can register, verify emails, log in via email or Google, and book medical appointments.  
+Powered by Firebase, secured with JWT, and integrated with SendGrid for email notifications.
 
 ---
 
-## 🛠️ Tech Stack
+## 📦 Features
 
-- Python 3 / Flask
-- Google Generative AI (Gemini API)
-- Redis
-- Flask-Limiter
-- JSON data for doctor list
-- Haversine formula for distance calculation
+- ✅ User registration with email verification via SendGrid  
+- 🔐 Secure login with JWT-based authentication  
+- 🟢 Google OAuth2 login  
+- 📅 Appointment creation with email confirmation  
+- 🔎 View personal or doctor-specific appointments  
+- 🌍 Multilingual support (Arabic, English, French) – (planned)  
+- ☁️ Firebase for database  
+- 🧪 Ready for testing & documentation
 
 ---
 
-## 🚀 Installation
+## 🗂️ Project Structure
+
+```
+
+app/
+├── routes/
+│   ├── auth.py                # Registration, login, OAuth
+│   └── appointments.py        # Appointment creation & retrieval
+├── services/
+│   └── mail\_service.py        # SendGrid email helpers
+├── utils/
+│   └── jwt\_utils.py           # JWT encode/decode + decorator
+├── firebase\_setup.py          # Firestore connection setup
+├── config.py                  # App configuration and API keys
+tests/
+└── test\_auth.py, test\_appointments.py (to be added)
+
+````
+
+---
+
+## 🚀 How to Run Locally
+
+1. **Clone the repo:**
 
 ```bash
 git clone https://github.com/NOURELHODABARKAT/ai-medical-assistant.git
 cd ai-medical-assistant
-python3 -m venv venv
-source venv/bin/activate   # or .\venv\Scripts\activate on Windows
+````
+
+2. **Install dependencies:**
+
+```bash
 pip install -r requirements.txt
-## Environment Setup
-Create a .env file or set the following environment variables:
+```
 
-env
-Copy
-Edit
-REDIS_URL=redis://localhost:6379
-GEMINI_API_KEY=your_google_gemini_api_key
-GEMINI_MODEL_NAME=gemini-1.5-flash
-Make sure Redis is running locally or via Redis Cloud.
-## Usage
-✅ Main Endpoint
-POST /api/diagnose
+3. **Set environment variables (create a `.env` file):**
 
-Example Request Payload:
-json
-Copy
-Edit
-{
-  "session_id": "123e4567-e89b-12d3-a456-426614174000",
-  "language": "en",
-  "answer": "I've had chest pain for the past two days.",
-  "lat": 36.75,
-  "lon": 3.06
-}
-Example Response:
-During interaction:
+```
+SENDGRID_API_KEY=your_sendgrid_api_key
+SECRET_KEY=your_flask_secret_key
+GOOGLE_CLIENT_ID=your_google_client_id
+GOOGLE_CLIENT_SECRET=your_google_client_secret
+```
 
-json
-Copy
-Edit
-{ "question": "What symptoms are you currently experiencing?", "done": false }
-When complete:
+4. **Run the app:**
 
-json
-Copy
-Edit
-{
-  "recommendation": "You should see a cardiologist.",
-  "specialty": "Cardiology",
-  "doctors": [
-    {
-      "name": "Dr. Amina Yacine",
-      "specialty": "Cardiology",
-      "lat": 36.76,
-      "lon": 3.05,
-      "distance": 1.2
-    }
-  ],
-  "done": true
-}
-esting
-Generate a session_id using uuid.uuid4()
+```bash
+flask run
+```
 
-Use Postman or curl to simulate the flow
+Access the app at: `http://localhost:5000`
 
-Redis is used to manage conversation state
+---
 
-🤝 Contributing
-Contributions are welcome!
-Feel free to:
+## 🔐 Authentication
 
-Fork the repository
+* JWT token is issued at login and stored in an HTTP-only cookie.
+* For protected routes, token is validated using `@jwt_required`.
+* Google login supported using `flask-oauthlib`.
 
-Create a new branch
+---
 
-Submit a pull request with your improvements
+## 📮 Email Sending
 
-📜 License
-MIT License. Open source and free to use.
+Emails are sent using [SendGrid](https://sendgrid.com/):
+
+* 📧 Email verification after registration
+* 📅 Appointment confirmation upon creation
+
+---
+
+## 📬 API Endpoints
+
+### 🔑 Auth Routes
+
+| Method | Endpoint                      | Description                  |
+| ------ | ----------------------------- | ---------------------------- |
+| POST   | `/auth/register`              | Register new user            |
+| GET    | `/auth/verify-email/<token>`  | Verify email with token      |
+| POST   | `/auth/login`                 | Log in with email & password |
+| GET    | `/auth/google-login`          | Google OAuth login redirect  |
+| GET    | `/auth/google-login/callback` | Google OAuth callback        |
+| POST   | `/auth/logout`                | Log out & remove session     |
+
+### 📅 Appointment Routes
+
+| Method | Endpoint                              | Description                            |
+| ------ | ------------------------------------- | -------------------------------------- |
+| POST   | `/appointments`                       | Create a new appointment               |
+| GET    | `/appointments`                       | Get current user’s appointments        |
+| GET    | `/appointments/by-doctor/<doctor_id>` | Get appointments for a specific doctor |
+
+---
+
+## ✅ Tests
+
+🧪 Unit tests are being added under `/tests` using `pytest`.
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License**.
+Made with ❤️ by [@NOURELHODABARKAT](https://github.com/NOURELHODABARKAT)
+
